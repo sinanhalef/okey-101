@@ -112,6 +112,13 @@ function settleStolen(match: MatchState, hand: HandState, p: PlayerHand, setting
   p.stolen = [];
 }
 
+/** Player pressed "Aç" but did not open: +101 (take-back, discard, or timeout). */
+function settleOpening(match: MatchState, hand: HandState, p: PlayerHand, now: number) {
+  if (!p.openingDeclared) return;
+  p.openingDeclared = false;
+  penalize(match, hand, p.seat, CONST.PENALTY, 'penalty.openCancel', undefined, now);
+}
+
 function startTurn(hand: HandState, seat: number, settings: TableSettings, now: number) {
   const p = hand.players[seat];
   hand.turnSeat = seat;
@@ -126,6 +133,7 @@ function startTurn(hand: HandState, seat: number, settings: TableSettings, now: 
   p.sideTakenTileId = null;
   p.sideObligation = false;
   p.stolen = [];
+  p.openingDeclared = false;
 }
 
 function endHand(match: MatchState, hand: HandState, finish: FinishInfo | null, now: number) {
@@ -229,6 +237,19 @@ export function applyAction(match: MatchState, action: Action, ctx: ApplyContext
       void hand;
       return match;
     }
+    case 'startOpen': {
+      const { hand, p } = requireTurn(match, ctx);
+      if (hand.phase !== 'act') throw new EngineError('MUST_DRAW_FIRST');
+      if (p.opened !== 'none') throw new EngineError('ALREADY_OPENED');
+      if (!p.openingDeclared) { p.openingDeclared = true; log(match, p.seat, 'action.startOpen', undefined, now); }
+      return match;
+    }
+    case 'cancelOpen': {
+      const { hand, p } = requireTurn(match, ctx);
+      if (!p.openingDeclared) throw new EngineError('NOT_OPENING');
+      settleOpening(match, hand, p, now);
+      return match;
+    }
     case 'open': {
       const { hand, p } = requireTurn(match, ctx);
       if (hand.phase !== 'act') throw new EngineError('MUST_DRAW_FIRST');
@@ -256,6 +277,7 @@ export function applyAction(match: MatchState, action: Action, ctx: ApplyContext
       takeFromRack(p, [...taken]);
       built.forEach((tiles, i) => hand.melds.push({ id: nextMeldId(hand), kind: action.melds[i].kind, tiles, ownerSeat: p.seat, areaSeat: p.seat }));
       p.opened = action.kind;
+      p.openingDeclared = false;
       p.openingValue = value;
       p.openedTurnIndex = hand.turnIndex;
       hand.openedThisTurn = true;
@@ -362,6 +384,7 @@ export function applyAction(match: MatchState, action: Action, ctx: ApplyContext
         if (wasSide) return match; // player must pick another tile
       }
       settleStolen(match, hand, p, settings, action.tileId, now);
+      settleOpening(match, hand, p, now);
       doDiscard(match, hand, p, action.tileId, now);
       return match;
     }
@@ -392,6 +415,7 @@ export function applyAction(match: MatchState, action: Action, ctx: ApplyContext
       if (hand.phase === 'draw') { drawTile(hand, p); hand.phase = 'act'; }
       if (p.sideObligation && p.sideTakenTileId !== null && inRack(p, p.sideTakenTileId)) returnSideTile(match, hand, p, settings, now);
       settleStolen(match, hand, p, settings, null, now);
+      settleOpening(match, hand, p, now);
       const mctx = ctxOf(hand, settings);
       let pool = p.rack.filter((t) => !isOkeyTile(t, hand.okey));
       if (pool.length === 0) pool = p.rack.slice();

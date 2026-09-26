@@ -52,6 +52,7 @@ export interface PlayerHand {
   openingValue: number;          // series total or pair count
   openedTurnIndex: number | null;
   declaredPairs: boolean;        // K5
+  openingDeclared: boolean;      // pressed "Aç" this turn; taking back or timing out costs 101
   sideTakenTileId: number | null;
   sideObligation: boolean;       // must lay the side-taken tile this turn
   stolen: StolenOkey[];
@@ -178,6 +179,8 @@ export type Action =
   | { type: 'draw' }
   | { type: 'takeSide' }
   | { type: 'returnSide' }
+  | { type: 'startOpen' }
+  | { type: 'cancelOpen' }
   | { type: 'open'; kind: 'series' | 'pairs'; melds: MeldInput[] }
   | { type: 'layMeld'; meld: MeldInput; areaSeat?: number }
   | { type: 'extend'; meldId: string; tileId: number; joker?: boolean; end: 'front' | 'back' }

@@ -6,6 +6,7 @@ export interface PublicPlayer {
   opened: OpenKind;
   openingValue: number;
   declaredPairs: boolean;
+  openingDeclared: boolean;
   inGamePoints: number;
 }
 
@@ -76,7 +77,7 @@ function publicHand(h: HandState): PublicHand {
     deckCount: h.deck.length, gosterge: h.gosterge, okey: h.okey,
     players: h.players.map((p) => ({
       seat: p.seat, tileCount: p.rack.length, opened: p.opened, openingValue: p.openingValue,
-      declaredPairs: p.declaredPairs, inGamePoints: p.inGamePoints,
+      declaredPairs: p.declaredPairs, openingDeclared: p.openingDeclared, inGamePoints: p.inGamePoints,
     })),
     melds: h.melds, discards: h.discards,
     turnSeat: h.turnSeat, phase: h.phase, turnIndex: h.turnIndex,

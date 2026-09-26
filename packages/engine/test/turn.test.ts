@@ -448,6 +448,28 @@ describe('turn flow', () => {
     expect(m.hand!.turnSeat).toBe(2);
   });
 
+  it('startOpen: taking back, discarding or timing out after pressing Aç costs 101; opening clears it', () => {
+    const m = makeMatch({ gosterge: G, racks: baseRacks() });
+    expect(tryAct(m, 0, { type: 'cancelOpen' })).toBe('NOT_OPENING');
+    act(m, 0, { type: 'startOpen' });
+    act(m, 0, { type: 'cancelOpen' });
+    expect(m.hand!.players[0].inGamePoints).toBe(101);
+    act(m, 0, { type: 'startOpen' });
+    act(m, 0, { type: 'open', kind: 'series', melds: OPEN103 });
+    expect(m.hand!.players[0].openingDeclared).toBe(false);
+    expect(m.hand!.players[0].inGamePoints).toBe(101);
+    act(m, 0, { type: 'discard', tileId: T('red', 1).id });
+    act(m, 1, { type: 'draw' });
+    act(m, 1, { type: 'startOpen' });
+    act(m, 1, { type: 'discard', tileId: T('blue', 1).id });
+    expect(m.hand!.players[1].inGamePoints).toBe(101);
+    act(m, 2, { type: 'draw' });
+    act(m, 2, { type: 'startOpen' });
+    act(m, 2, { type: 'timeout' }, NOW + 200_000);
+    expect(m.hand!.players[2].inGamePoints).toBe(101);
+    expect(m.hand!.turnSeat).toBe(3);
+  });
+
   it('K6: bonus for 150+ opening (self mode) and others mode', () => {
     const big = [
       { kind: 'run' as const, tiles: ids(T('red', 10), T('red', 11), T('red', 12), T('red', 13)) },

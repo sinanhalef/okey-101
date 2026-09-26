@@ -4,7 +4,7 @@ import { mulberry32, shuffle } from './rng';
 
 export function newPlayerHand(seat: number, rack: Tile[]): PlayerHand {
   return {
-    seat, rack, opened: 'none', openingValue: 0, openedTurnIndex: null, declaredPairs: false,
+    seat, rack, opened: 'none', openingValue: 0, openedTurnIndex: null, declaredPairs: false, openingDeclared: false,
     sideTakenTileId: null, sideObligation: false, stolen: [], inGamePoints: 0, nextTurnPenaltySeconds: 0,
   };
 }

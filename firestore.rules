@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tables/{tableId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+      match /hands/{uid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow write: if false;
+      }
+      match /secret/{doc} {
+        allow read, write: if false;
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "okey101",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "functions",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test -w @okey101/engine",
+    "build": "npm run build -w @okey101/shared && npm run build -w @okey101/engine && npm run build -w functions && npm run build -w @okey101/web",
+    "dev": "npm run dev -w @okey101/web",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

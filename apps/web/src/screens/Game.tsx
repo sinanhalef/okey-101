@@ -146,15 +146,11 @@ export function Game({ tableId, user, state }: { tableId: string; user: User; st
   const Plate = ({ seat, cls }: { seat: number; cls: string }) => {
     const p = hand.players[seat];
     const active = hand.turnSeat === seat && hand.phase !== 'finished';
-    const pile = hand.discards[seat];
     return (
       <div className={`plate ${cls} ${active ? 'active' : ''}`}>
         <div className="name">{name(seat)}{seat === mySeat && <span className="chip">{t('common.you')}</span>}</div>
         <div className="meta">{t('game.tiles', { n: p.tileCount })} · {p.opened === 'none' ? (p.declaredPairs ? t('game.declared') : t('game.notOpened')) : t(`game.opened.${p.opened}`, { v: fmt(p.openingValue) })}</div>
         <div className="meta">{view.totals[seat]} {t('common.points')}{p.inGamePoints ? <span className="pen"> · {p.inGamePoints > 0 ? '+' : ''}{p.inGamePoints}</span> : null}</div>
-        {seat !== mySeat && pile.length > 0 && (
-          <div className="pile">{pile.slice(-6).map((d, i) => <TileView key={i} tile={d.tile} size="xs" penalized={d.penalized} />)}</div>
-        )}
         {active && <div className={`ring ${secondsLeft <= 5 ? 'low' : ''}`} style={{ width: `${ringPct}%` }} />}
       </div>
     );
@@ -220,6 +216,15 @@ export function Game({ tableId, user, state }: { tableId: string; user: User; st
           </div>
         </div>
         <div className="seat-right"><Plate seat={rel(1)} cls="" /></div>
+        {[{ seat: rel(2), cls: 'tl' }, { seat: rel(1), cls: 'tr' }].map(({ seat, cls }) => {
+          const last = hand.discards[seat].at(-1);
+          return (
+            <div className={`corner ${cls}`} key={cls}>
+              <div className="slot">{last ? <TileView tile={last.tile} penalized={last.penalized} /> : null}</div>
+              <span>{name(seat)}</span>
+            </div>
+          );
+        })}
         <div className="center">
           <div className="melds">
             {meldsByArea.map((g) => (

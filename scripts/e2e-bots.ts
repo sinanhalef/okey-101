@@ -18,6 +18,8 @@ const HANDS = Number(args.find((a) => /^\d+$/.test(a)) ?? 5);
 const BOTS = args.includes('--bots') ? Number(args[args.indexOf('--bots') + 1]) : 4;
 const TURN = args.includes('--turn') ? Number(args[args.indexOf('--turn') + 1]) : 30;
 const PROD = args.includes('--prod');
+const TEAMS = args.includes('--teams');
+const RULES = args.includes('--rules') ? args[args.indexOf('--rules') + 1].split(',').map((r) => r.trim().toLowerCase()) : ['k2', 'k3', 'k6'];
 
 initializeApp({ projectId: PROJECT });
 const db = getFirestore();
@@ -137,7 +139,8 @@ function decide(m: MatchState, seat: number): Action {
 
 async function main() {
   const users = await Promise.all(Array.from({ length: BOTS }, () => signIn()));
-  const settings = { mode: 'single', hands: HANDS, turnSeconds: TURN, finishReward: 'finisher', k6Mode: 'self', rules: { k1: false, k2: true, k3: true, k4: false, k5: false, k6: true, k7: false, k8: false, k9: false, k10: false } };
+  const rules = Object.fromEntries(['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8', 'k9', 'k10'].map((k) => [k, RULES.includes(k)]));
+  const settings = { mode: TEAMS ? 'teams' : 'single', hands: HANDS, turnSeconds: TURN, finishReward: 'finisher', k6Mode: 'self', rules };
   const { tableId, code } = await call(users[0].token, 'createTable', { name: 'Bot0', settings, isPublic: false });
   for (let i = 1; i < BOTS; i++) await call(users[i].token, 'joinTable', { name: `Bot${i}`, code });
   console.log('table', tableId, 'code', code, BOTS < 4 ? `- waiting for ${4 - BOTS} human(s) to join with the code` : '');

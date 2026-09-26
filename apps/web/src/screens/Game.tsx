@@ -30,6 +30,7 @@ export function Game({ tableId, user, state }: { tableId: string; user: User; st
   const myTurn = seated && hand.turnSeat === mySeat && hand.phase !== 'finished';
   const mctx: MeldContext = useMemo(() => ({ okey: hand.okey, gosterge: hand.gosterge, k3: settings.rules.k3 }), [hand.okey, hand.gosterge, settings.rules.k3]);
   const isOkey = useCallback((tile: Tile) => isOkeyTile(tile, hand.okey), [hand.okey]);
+  const okeyTile: Tile = useMemo(() => ({ id: -1, color: hand.okey.color, number: hand.okey.number }), [hand.okey]);
 
   // ---- local UI state ----
   const rackTiles = priv?.rack ?? [];
@@ -193,7 +194,7 @@ export function Game({ tableId, user, state }: { tableId: string; user: User; st
     <div className="game">
       <div className="topbar">
         <span className="status">{t('game.hand', { n: hand.handNumber, total: settings.hands })}</span>
-        <span>{t('game.okey')}: <b style={{ color: `var(--${hand.okey.color})` }}>{hand.okey.number}</b></span>
+        <span className="row" style={{ gap: 6 }}>{t('game.okey')} <TileView tile={okeyTile} size="xs" /></span>
         {me && <span>{t('game.handValue', { v: fmt(handValue) })}</span>}
         {me?.opened === 'none' && <span>{groupsKind === 'pairs' ? t('game.threshold.pairs', { v: pairThreshold }) : t('game.threshold', { v: fmt(seriesThreshold) })}</span>}
         <span className="spacer" />

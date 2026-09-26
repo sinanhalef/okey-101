@@ -267,17 +267,19 @@ export function Game({ tableId, user, state }: { tableId: string; user: User; st
           </div>
         )}
         <div className="rackwrap">
-          <div className="side">
-            <span>{name(leftSeat)}</span>
-            <div className="slot">{sideTile ? <TileView tile={sideTile.tile} penalized={sideTile.penalized} hot={myTurn && hand.phase === 'draw' && sideTakeable} onClick={() => myTurn && hand.phase === 'draw' && sideTakeable && play({ type: 'takeSide' })} /> : null}</div>
+          <div className="sides">
+            <div className="side">
+              <span>{name(leftSeat)}</span>
+              <div className="slot">{sideTile ? <TileView tile={sideTile.tile} penalized={sideTile.penalized} hot={myTurn && hand.phase === 'draw' && sideTakeable} onClick={() => myTurn && hand.phase === 'draw' && sideTakeable && play({ type: 'takeSide' })} /> : null}</div>
+            </div>
+            <div className="side side-mine">
+              <div className="slot" onClick={doDiscard}>{seated && hand.discards[mySeat].length > 0 ? <TileView tile={hand.discards[mySeat].at(-1)!.tile} penalized={hand.discards[mySeat].at(-1)!.penalized} /> : <TileBack className="xs" />}</div>
+              <span>{seated ? t('common.you') : ''}</span>
+            </div>
           </div>
           {seated ? (
             <Rack tiles={rackTiles} order={order} onOrder={setOrder} selected={selected} onToggle={toggle} flipped={flipped} isOkey={isOkey} dimIds={groupIds} highlightId={priv?.sideObligation ? priv.sideTakenTileId : null} />
           ) : <div className="rack" />}
-          <div className="side">
-            <span>{seated ? t('common.you') : ''}</span>
-            <div className="slot" onClick={doDiscard}>{seated && hand.discards[mySeat].length > 0 ? <TileView tile={hand.discards[mySeat].at(-1)!.tile} penalized={hand.discards[mySeat].at(-1)!.penalized} /> : <TileBack className="xs" />}</div>
-          </div>
         </div>
         <div className="log">
           {view.log.slice(-3).reverse().map((l, i) => <div key={i}>{l.seat !== null && <b>{name(l.seat)} </b>}{t(l.key, l.params)}</div>)}

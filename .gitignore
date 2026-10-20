@@ -1,10 +1,28 @@
+# dependencies
 node_modules/
+
+# build outputs
 dist/
 lib/
+*.tsbuildinfo
+
+# local env / secrets
+.env
+.env.*
+!.env.example
+
+# firebase
 .firebase/
-*.log
-.DS_Store
-.env*
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+pubsub-debug.log
+*.log
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# test / coverage
+coverage/

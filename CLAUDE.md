@@ -1,7 +1,7 @@
 # 101 Okey
 
 Contemporary, minimal 101 Okey. Web first (React), iOS/Android later via Expo sharing the engine.
-Rules spec: `101 Okey — Oyun Tanımı ve Opsiyonel Kurallar.md` (Turkish, authoritative). UI is Turkish only for now;
+Rules spec: `docs/rules-tr.md` (Turkish, authoritative). UI is Turkish only for now;
 all strings live in `packages/shared/src/i18n/tr.ts` (add `en.ts` with the same keys later).
 
 ## Layout (npm workspaces)
